@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+
+    environment:
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+    ports:
+      - '5672:5672'   # Default RabbitMQ port
+      - '15672:15672' # RabbitMQ management plugin
+    networks:
+      - project1  # Attach to the custom network
+
+networks:
+  project1:
+    external: true

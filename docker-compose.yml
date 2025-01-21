@@ -1,0 +1,184 @@
+version: '3.8'
+
+services:
+
+  reverse-proxy:
+    image: traefik:v3.2
+    command: 
+      - --api.insecure=true
+      - --providers.docker
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+      - --log.level=DEBUG
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- traefik_logs:/var/log/traefik
+      - traefik_logs:/traefik_logs
+    networks:
+      - backend
+  
+  # Device Database (MySQL for spring device service)
+  device-db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'device-db'
+      MYSQL_ROOT_PASSWORD: 'ETS2.com'
+    ports:
+      - "3307:3306"  # Map container's MySQL port to a unique host port
+    networks:
+      - backend
+
+  # User Database (MySQL for spring user service)
+  user-db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'city-db'
+      MYSQL_ROOT_PASSWORD: 'ETS2.com'
+    ports:
+      - "3308:3306"  # Map container's MySQL port to a unique host port
+    networks:
+      - backend 
+
+  monitoring-db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'monitoring-db'
+      MYSQL_ROOT_PASSWORD: 'ETS2.com'
+    ports:
+      - "3309:3306"  # Map container's MySQL port to a unique host port
+    networks:
+      - backend 
+  
+  # Spring User Service
+  spring-user:
+    build:
+      context: ./UserManagement
+      dockerfile: Dockerfile
+    depends_on:
+      - user-db
+    deploy:
+      replicas: 2
+    environment:
+      - DB_IP=user-db
+      - DB_PORT=3306
+      - DB_DBNAME=city-db
+      - DB_USER=root
+      - DB_PASSWORD=ETS2.com
+      - spring.profiles.active=docker
+    networks:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.user.rule=Host(`user.localhost`) || PathPrefix(`/user`)"
+      - "traefik.http.middlewares.user-strip.stripprefix.prefixes=/user"
+      - "traefik.http.routers.user.middlewares=user-strip"
+      - "traefik.http.services.user.loadbalancer.server.port=8080"
+
+  spring-chat:
+    build:
+      context: ./Chat
+      dockerfile: Dockerfile
+    networks:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chat.rule=Host(`chat.localhost`) || PathPrefix(`/chat`)"
+      - "traefik.http.middlewares.chat-strip.stripprefix.prefixes=/chat"
+      - "traefik.http.routers.chat.middlewares=chat-strip"
+      - "traefik.http.services.chat.loadbalancer.server.port=8084"
+      - "traefik.http.middlewares.websocket.headers.customResponseHeaders.Access-Control-Allow-Origin=*"
+
+  # Spring Device Service
+  spring-device:
+    build:
+      context: ./DeviceManagement
+      dockerfile: Dockerfile
+    depends_on:
+      - device-db
+      - rabbitmq
+    volumes: 
+      - ./deviceId.json:/app/deviceId.json
+    deploy:
+      replicas: 2
+    environment:
+      - DB_IP=device-db
+      - DB_PORT=3306
+      - DB_DBNAME=device-db
+      - DB_USER=root
+      - DB_PASSWORD=ETS2.com
+      - CONFIG_PATH=/app/deviceId.json
+      - RABBIT_HOST=rabbitmq
+    networks:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.device.rule=Host(`device.localhost`) || PathPrefix(`/device`)"
+      - "traefik.http.middlewares.device-strip.stripprefix.prefixes=/device"
+      - "traefik.http.routers.device.middlewares=device-strip"
+      - "traefik.http.services.device.loadbalancer.server.port=8081"
+
+  spring-monitoring:
+    build:
+      context: ./Monitoring
+      dockerfile: Dockerfile
+    depends_on:
+      - monitoring-db
+      - rabbitmq
+    deploy: 
+      replicas: 1
+    environment:
+      - DB_IP=monitoring-db
+      - DB_PORT=3306
+      - DB_DBNAME=monitoring-db
+      - DB_USER=root
+      - DB_PASSWORD=ETS2.com
+      - RABBIT_HOST=rabbitmq
+    networks:
+      - backend
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.monitoring.rule=Host(`monitor.localhost`) || PathPrefix(`/monitoring`)"
+      - "traefik.http.middlewares.monitoring-strip.stripprefix.prefixes=/monitoring"
+      - "traefik.http.routers.monitoring.middlewares=monitoring-strip"
+      - "traefik.http.services.monitoring.loadbalancer.server.port=8082"
+
+  # React Frontend
+  react-container:
+    build:
+      context: ./DS-Frontend/frontend
+      dockerfile: Dockerfile
+    ports: 
+     - "3000:3000"
+    networks:
+      - backend
+    depends_on:
+      - spring-chat
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.react-container.rule=Host(`react.localhost`)"
+      - "traefik.http.services.react-container.loadbalancer.server.port=3000"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - "5672:5672" # Messaging port
+      - "15672:15672" # Management UI port
+    networks:
+      - backend
+
+networks:
+  backend:
+      driver: bridge
+
+volumes: 
+    traefik_logs:

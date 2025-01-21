@@ -1,0 +1,12 @@
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\config\AppConfig.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\config\JwtAuthentificationFilter.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\config\RabbitMqConfig.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\controller\UserController.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\dto\UserDTO.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\entity\Role.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\entity\User.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\mapper\UserMapper.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\repository\UserRepository.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\service\RabbitMqEvents.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\service\UserService.java
+C:\Users\casia\OneDrive\Desktop\DS proiect\UserManagement\src\main\java\com\example\usermanagement\UserManagementApplication.java
