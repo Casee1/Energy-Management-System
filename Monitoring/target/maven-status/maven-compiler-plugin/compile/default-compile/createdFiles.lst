@@ -1,0 +1,8 @@
+com\example\monitoring\entity\Monitoring.class
+com\example\monitoring\repository\MonitoringRepository.class
+com\example\monitoring\MonitoringApplication.class
+com\example\monitoring\service\RabbitMqConsumer.class
+com\example\monitoring\config\RabbitMqConfig.class
+com\example\monitoring\service\MonitoringService.class
+com\example\monitoring\entity\SensorData.class
+com\example\monitoring\entity\DeviceMonitoring.class

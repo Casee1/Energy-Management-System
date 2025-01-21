@@ -1,0 +1,8 @@
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\config\RabbitMqConfig.java
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\entity\DeviceMonitoring.java
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\entity\Monitoring.java
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\entity\SensorData.java
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\MonitoringApplication.java
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\repository\MonitoringRepository.java
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\service\MonitoringService.java
+C:\Users\casia\IdeaProjects\Monitoring\src\main\java\com\example\monitoring\service\RabbitMqConsumer.java
